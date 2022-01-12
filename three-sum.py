@@ -24,22 +24,16 @@ class Solution:
             while left_idx < right_idx:
                 current_sum = nums[i] + nums[left_idx] + nums[right_idx]
                 
-                if current_sum == 0:
+                if right_idx < len(nums) - 1 and nums[right_idx] == nums[right_idx + 1]:
+                    right_idx -= 1
+                elif current_sum > 0:
+                    right_idx -= 1
+                elif current_sum < 0:
+                    left_idx += 1
+                else:
                     result.append([nums[i], nums[left_idx], nums[right_idx]])
                     
                     right_idx -= 1
-                    left_idx += 1
-                    
-                    while right_idx < len(nums) - 2 and nums[right_idx] == nums[right_idx + 1]:
-                        right_idx -= 1
-                        
-                    while left_idx < len(nums) and nums[left_idx] == nums[left_idx - 1]:
-                        left_idx += 1
-                    
-                if current_sum > 0:
-                    right_idx -= 1
-                    
-                if current_sum < 0:
                     left_idx += 1
                     
         return result
