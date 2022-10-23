@@ -5,15 +5,15 @@ import (
 )
 
 func main() {
-	var test_arr []int8 = []int8{1, 5, -1, 0, 7, 15, 7, 10}
+	var arr []int8 = []int8{1, 5, -1, 0, 7, 15, 7, 10}
 
-	var sorted_arr []int8 = insertionSort(test_arr)
+	insertionSort(arr)
 
-	fmt.Println(sorted_arr)
+	fmt.Println(arr)
 }
 
 // O(n^2)
-func insertionSort(arr []int8) []int8 {
+func insertionSort(arr []int8) {
 	var slice_size int = len(arr) // O(1)
 	for i := 1; i < slice_size; i++ {
 		var key int8 = arr[i]
@@ -24,5 +24,4 @@ func insertionSort(arr []int8) []int8 {
 		}
 		arr[j+1] = key
 	}
-	return arr
 }
