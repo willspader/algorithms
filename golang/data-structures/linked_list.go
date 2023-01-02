@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type linkedList struct {
 	head   *node
@@ -17,44 +15,72 @@ type node struct {
 func main() {
 	var linkedList linkedList = linkedList{head: nil, length: 0}
 
-	linkedList.insertAt(5, 0)
-	linkedList.insertAt(7, 1)
-	linkedList.insertAt(2, 2)
-	linkedList.insertAt(9, 1)
-	linkedList.insertAt(-3, 3)
+	linkedList.insert(5)
+	linkedList.insert(5)
+	linkedList.insert(7)
+	linkedList.insert(5)
+	linkedList.insert(10)
+	linkedList.insert(5)
 
-	// expect [5, 9, 7, -3, 2]
+	linkedList.remove(5)
+
 	fmt.Println(linkedList)
 	fmt.Println(linkedList.head.data)
 	fmt.Println(linkedList.head.next.data)
-	fmt.Println(linkedList.head.next.next.data)
-	fmt.Println(linkedList.head.next.next.next.data)
-	fmt.Println(linkedList.head.next.next.next.next.data)
-
-	linkedList.removeAt(0)
-	linkedList.removeAt(3)
-	linkedList.removeAt(1)
-
-	// expect [9, -3]
-	fmt.Println(linkedList)
-	fmt.Println(linkedList.head.data)
-	fmt.Println(linkedList.head.next.data)
-
-	linkedList.insertAt(0, 1)
-	linkedList.insertAt(7, 3)
-	linkedList.insertAt(4, 4)
-	linkedList.insertAt(2, 0)
-
-	// expect [2, 9, 0, -3, 7, 4]
-	fmt.Println(linkedList)
-	fmt.Println(linkedList.head.data)
-	fmt.Println(linkedList.head.next.data)
-	fmt.Println(linkedList.head.next.next.data)
-	fmt.Println(linkedList.head.next.next.next.data)
-	fmt.Println(linkedList.head.next.next.next.next.data)
-	fmt.Println(linkedList.head.next.next.next.next.next.data)
 }
 
+// It inserts a node at the end of the list.
+func (list *linkedList) insert(data int) {
+	if list.length == 0 {
+		list.head = &node{next: nil, data: data}
+		list.length++
+		return
+	}
+
+	var head *node = list.head
+
+	for head.next != nil {
+		head = head.next
+	}
+
+	head.next = &node{next: nil, data: data}
+	list.length++
+}
+
+// It removes all node occurrences of `data`
+func (list *linkedList) remove(data int) {
+	if list.length == 0 {
+		return
+	}
+
+	if list.length == 1 && list.head.data == data {
+		list.head = nil
+	}
+
+	var head *node = list.head
+	for head.next != nil {
+		var prev *node = head
+
+		if head.next.data == data {
+			if head.next.next != nil {
+				prev.next = head.next.next
+				head = head.next
+			} else {
+				prev.next = nil
+			}
+			list.length--
+		} else {
+			head = head.next
+		}
+	}
+
+	if list.length > 1 && list.head.data == data {
+		list.head = list.head.next
+		list.length--
+	}
+}
+
+// It inserts a node at the specified position. If the position is bigger than list.length, then it does nothing.
 func (list *linkedList) insertAt(data int, pos int) {
 	if list.length == 0 {
 		list.head = &node{next: nil, data: data}
@@ -68,7 +94,7 @@ func (list *linkedList) insertAt(data int, pos int) {
 		return
 	}
 
-	var prev *node = list.getAt(pos)
+	var prev *node = list.getPrev(pos)
 
 	if prev != nil {
 		prev.next = &node{next: prev.next, data: data}
@@ -76,6 +102,7 @@ func (list *linkedList) insertAt(data int, pos int) {
 	}
 }
 
+// It removes a node from the specified position. If the position is >= list.length, then it does nothing.
 func (list *linkedList) removeAt(pos int) {
 	if list.length == 0 {
 		return
@@ -91,7 +118,7 @@ func (list *linkedList) removeAt(pos int) {
 		return
 	}
 
-	var prev *node = list.getAt(pos)
+	var prev *node = list.getPrev(pos)
 
 	if prev == nil {
 		return
@@ -105,7 +132,8 @@ func (list *linkedList) removeAt(pos int) {
 	list.length--
 }
 
-func (list *linkedList) getAt(pos int) *node {
+// It gets a previous node from the specified position.
+func (list *linkedList) getPrev(pos int) *node {
 	if pos > list.length {
 		return nil
 	}
