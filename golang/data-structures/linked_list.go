@@ -47,7 +47,7 @@ func (list *linkedList) insert(data int) {
 	list.length++
 }
 
-// It removes all node occurrences of `data`
+// It removes all node occurrences of `data`. If the list is empty, then it does nothing.
 func (list *linkedList) remove(data int) {
 	if list.length == 0 {
 		return
