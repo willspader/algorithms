@@ -29,6 +29,23 @@ func main() {
 	fmt.Println(linkedList.head.next.data)
 }
 
+// It checks if the linked list contains at least one occurrence of `data`
+func (list *linkedList) contains(data int) bool {
+	if list.length == 0 {
+		return false
+	}
+
+	var head *node = list.head
+	for head.next != nil {
+		if head.data == data {
+			return true
+		}
+		head = head.next
+	}
+
+	return false
+}
+
 // It inserts a node at the end of the list.
 func (list *linkedList) insert(data int) {
 	if list.length == 0 {
