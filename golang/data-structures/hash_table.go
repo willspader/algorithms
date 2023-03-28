@@ -1,5 +1,7 @@
 package main
 
+// developed for learning purposes, this hashtable implementation does not handle colision
+
 import (
 	"bytes"
 	"encoding/binary"
