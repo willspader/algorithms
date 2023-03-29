@@ -30,10 +30,10 @@ type Node[K comparable, V any] struct {
 	next        *Node[K, V]
 }
 
-func (hashMap HashMap[K, V]) get(key K) (V, bool) {
-	var hash int = hashMap.getHash(key)
+func (hashMap HashMap[K, V]) Get(key K) (V, bool) {
+	var idx int = hashMap.getHash(key)
 
-	var linkedList LinkedList[K, V] = hashMap.arr[hash]
+	var linkedList LinkedList[K, V] = hashMap.arr[idx]
 
 	if linkedList.size == 0 {
 		return Node[K, V]{}.data, false
@@ -50,6 +50,57 @@ func (hashMap HashMap[K, V]) get(key K) (V, bool) {
 	}
 
 	return Node[K, V]{}.data, false
+}
+
+func (hashMap HashMap[K, V]) Put(key K, value V) {
+	var idx int = hashMap.getHash(key)
+
+	var linkedList LinkedList[K, V] = hashMap.arr[idx]
+
+	if linkedList.size == 0 {
+		linkedList.head = &Node[K, V]{key: key, data: value, accessCount: 0, next: nil}
+		return
+	}
+
+	if linkedList.size < 5 {
+		linkedList.insert(linkedList, &Node[K, V]{key: key, data: value, accessCount: 0, next: nil})
+		return
+	}
+
+	var prevLru Node[K, V] = linkedList.findPrevLru(linkedList)
+
+	prevLru.next = &Node[K, V]{key: key, data: value, accessCount: 0, next: prevLru.next.next}
+}
+
+func (LinkedList[K, V]) findPrevLru(linkedList LinkedList[K, V]) Node[K, V] {
+	if linkedList.size == 0 || linkedList.size == 1 {
+		return Node[K, V]{}
+	}
+
+	var lru *Node[K, V] = linkedList.head
+	var compare *Node[K, V] = lru
+	for compare != nil {
+		if compare.accessCount < lru.accessCount {
+			lru = compare
+		}
+		compare = compare.next
+	}
+
+	return *compare
+}
+
+func (LinkedList[K, V]) insert(linkedList LinkedList[K, V], node *Node[K, V]) {
+	if linkedList.size == 0 {
+		linkedList.head = node
+		return
+	}
+
+	var head *Node[K, V] = linkedList.head
+	for head != nil {
+		head = head.next
+	}
+
+	head.next = node
 }
 
 // universal hashing formula
@@ -98,6 +149,10 @@ func getPrimeBiggerThan(min int) int {
 		}
 	}
 	return test
+}
+
+func New() {
+
 }
 
 func main() {
