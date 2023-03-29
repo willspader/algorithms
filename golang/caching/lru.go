@@ -55,10 +55,11 @@ func (hashMap HashMap[K, V]) Get(key K) (V, bool) {
 func (hashMap HashMap[K, V]) Put(key K, value V) {
 	var idx int = hashMap.getHash(key)
 
-	var linkedList LinkedList[K, V] = hashMap.arr[idx]
+	var linkedList *LinkedList[K, V] = &hashMap.arr[idx]
 
 	if linkedList.size == 0 {
 		linkedList.head = &Node[K, V]{key: key, data: value, accessCount: 0, next: nil}
+		linkedList.size++
 		return
 	}
 
@@ -67,39 +68,47 @@ func (hashMap HashMap[K, V]) Put(key K, value V) {
 		return
 	}
 
-	var prevLru Node[K, V] = linkedList.findPrevLru(linkedList)
+	var prevLru *Node[K, V] = linkedList.findPrevLru(linkedList)
 
-	prevLru.next = &Node[K, V]{key: key, data: value, accessCount: 0, next: prevLru.next.next}
+	if prevLru.next == nil {
+		prevLru.key = key
+		prevLru.accessCount = 0
+		prevLru.data = value
+		prevLru.next = nil
+	} else {
+		prevLru.key = key
+		prevLru.accessCount = 0
+		prevLru.data = value
+		prevLru.next = prevLru.next.next
+	}
 }
 
-func (LinkedList[K, V]) findPrevLru(linkedList LinkedList[K, V]) Node[K, V] {
-	if linkedList.size == 0 || linkedList.size == 1 {
-		return Node[K, V]{}
-	}
-
+func (LinkedList[K, V]) findPrevLru(linkedList *LinkedList[K, V]) *Node[K, V] {
 	var lru *Node[K, V] = linkedList.head
 	var compare *Node[K, V] = lru
-	for compare != nil {
+	for compare.next != nil {
 		if compare.accessCount < lru.accessCount {
 			lru = compare
 		}
 		compare = compare.next
 	}
 
-	return *compare
+	return compare
 }
 
-func (LinkedList[K, V]) insert(linkedList LinkedList[K, V], node *Node[K, V]) {
+func (LinkedList[K, V]) insert(linkedList *LinkedList[K, V], node *Node[K, V]) {
 	if linkedList.size == 0 {
 		linkedList.head = node
+		linkedList.size++
 		return
 	}
 
 	var head *Node[K, V] = linkedList.head
-	for head != nil {
+	for head.next != nil {
 		head = head.next
 	}
 
+	linkedList.size++
 	head.next = node
 }
 
@@ -151,10 +160,58 @@ func getPrimeBiggerThan(min int) int {
 	return test
 }
 
-func New() {
+func printLRU(hashMap HashMap[string, int]) {
+	println("printing each linked list size")
+	for i := 0; i < len(hashMap.arr); i++ {
+		println(hashMap.arr[i].size)
+	}
 
+	println()
+
+	println("printing lru")
+	for i := 0; i < len(hashMap.arr); i++ {
+		println("array position = ", i)
+		var head *Node[string, int] = hashMap.arr[i].head
+		for head != nil {
+			println(head.data)
+			head = head.next
+		}
+	}
+}
+
+func New(size int) HashMap[string, int] {
+	var a int = getPositiveRandom()
+	var b int = getPositiveRandom()
+
+	var prime int = getPrimeBiggerThan(size)
+
+	hashMap := HashMap[string, int]{arr: make([]LinkedList[string, int], size), size: size, a: a, b: b, prime: prime}
+
+	return hashMap
 }
 
 func main() {
+	t := New(5)
 
+	println("random a = ", t.a)
+	println("random b = ", t.b)
+	println("prime number = ", t.prime)
+
+	t.Put("first-key", 10)
+
+	t.Put("second-key", 20)
+
+	t.Put("third-key", 30)
+	t.Put("fourth-key", 40)
+	t.Put("fifth-key", 50)
+	t.Put("sixth-key", 70)
+	t.Put("sdfsdf-key", 80)
+	// t.Put("sixakoaskth-key", 90) -> hash -1 index out of range
+	t.Put("vsdv-key", 100)
+	t.Put("eoqeqe-key", 120)
+	t.Put("swe-key", 130)
+	t.Put("adwdw-key", 140)
+	t.Put("adwdww-key", 150) // -> eoqeqe-key substitute
+
+	printLRU(t)
 }
