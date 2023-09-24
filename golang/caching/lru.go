@@ -206,7 +206,7 @@ func main() {
 	t.Put("fifth-key", 50)
 	t.Put("sixth-key", 70)
 	t.Put("sdfsdf-key", 80)
-	// t.Put("sixakoaskth-key", 90) -> hash -1 index out of range
+	//t.Put("sixakoaskth-key", 90) // -> hash -1 index out of range
 	t.Put("vsdv-key", 100)
 	t.Put("eoqeqe-key", 120)
 	t.Put("swe-key", 130)
